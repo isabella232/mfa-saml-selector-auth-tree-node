@@ -2,9 +2,8 @@
 
 Some use-cases require IdP to provide different MFA authentication mechanism depending on SAML SP app such as HOTP Email for SP1 and HOTP SMS for SP2. One way to implement this is via SAML's AuthnContextClassRef where specific AM chain/tree can 
 be mapped to required Context ref but this requries SAML SP to provide this info in SAML request. Not all SAML SPs can provide this info and this also means SAML SP has control over authentication mechanism at IdP side. </br></br>
-Other option is to implement this via a custom authentication node. </br>
-This custom authentication decision node allows MFA selection based on spEntityId. This node retrieves spEntityId from referer URL string and return outcome mapped to given choice. If spEntityId is not found or matched, then it </br>
-returns "Other" outcome.  
+Other option is to implement this via a custom authentication node. This custom authentication decision node allows MFA selection based on spEntityId. This node retrieves spEntityId from referer URL string and return outcome mapped to given choice.
+If spEntityId is not found or matched, then it returns "Other" outcome. </br>  
  
 Disclaimer of Liability :
 =========================
@@ -44,7 +43,7 @@ Testing:
 2. http://openam551.example.com:8989/openam/idpssoinit?metaAlias=/employees/idp&spEntityID=http://sp.spring.com:9494/spring-security-saml2-sample/saml/metadata&binding=HTTP-POST&RelayState=http%3A%2F%2Fforgerock.com
 
 * SP initiated SAML flow Authentication, invoke URLs such as:
-1. Invoke URL: http://openam551.sp.com:8585/openam/spssoinit?metaAlias=/sp&idpEntityID=http://openam551.example.com:8989/openam&binding=HTTP-POST&RelayState=http%3A%2F%2Fforgerock.com
+1. http://openam551.sp.com:8585/openam/spssoinit?metaAlias=/sp&idpEntityID=http://openam551.example.com:8989/openam&binding=HTTP-POST&RelayState=http%3A%2F%2Fforgerock.com
 
 * * *
 
