@@ -66,16 +66,17 @@ public class MFASAMLSelectorNode implements Node {
     @Override
     public Action process(TreeContext context) throws NodeProcessException {
 
-        //Pull user-agent out of headers
+        //Pull referer out of headers
         List<String> refererList = context.request.headers.get("referer");
         debug.message("referer : " + refererList);
 
-        //If no user-agent present at all
+        //If referer present at all
         if (refererList.size() != 1 && refererList.get(0).contains("spEntityID")) {
             debug.message("No specific referer found containing spEntityID");
             return goTo("Other").build();
         }
 
+        // Create map of URL params
         String referer = refererList.get(0);
         String[] params = referer.split("&");
         Map<String, String> paramMap = new HashMap<>();
@@ -90,6 +91,7 @@ public class MFASAMLSelectorNode implements Node {
 
         String spEntityID = paramMap.get("spEntityID");
 
+        // If given choice match with spEntityID param
         if (config.choices().contains(spEntityID)) {
             debug.message("Matched spEntityID: " + spEntityID);
             return goTo(spEntityID).build();

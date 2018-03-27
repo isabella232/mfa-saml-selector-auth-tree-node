@@ -1,6 +1,10 @@
 # MFASAMLSelectorNode
 
-* An authentication decision node which prompts with a choice to select OTP mode like Email, SMS etc  
+Some use-cases require IdP to prompt user for certain MFA type depending on SAML SP app such as HOTP Email from SP1 and HOTP SMS for SP2. One way to implement this is via SAML's AuthnContextClassRef where specific AM chain/tree can </br>
+be mapped to required Context ref but this requries SAML SP to provide this info in SAML request. Not all SAML SPs can provide this info and this also means SAML SP has control over authentication mechanism at IdP side. </br>
+Other option is to implement this via a custom authentication node. </br>
+This custom authentication decision node allows MFA selection based on spEntityId. This node retrieves spEntityId from referer URL string and return outcome mapped to given choice. If spEntityId is not found or matched, then it </br>
+returns "Other" outcome.  
  
 Disclaimer of Liability :
 =========================
@@ -26,18 +30,21 @@ AM Configuration:
 1. Build custom authentication node by running "mvn clean install" in the directory containing the pom.xml. 
 2. Copy the custom authentication node .jar file to WEB-INF/lib/ where AM is deployed. Refer instructions: *[Building and Installing Custom Authentication Modules](https://backstage.forgerock.com/docs/am/5.5/authentication-guide/#build-config-sample-auth-module)*
 3. Restart the web container to pick up the new node. The node will then appear in the authentication trees components palette.
-4. Create a new Authentication tree: otp 
-5. Add required nodes in this tree, include OTPSelector node
-6. Add required outcomes for OTPSelector node like SMS, Email and link appropriate authentication nodes for these outcomes.  
-![OTP Tree](./OTPTree.png)
+4. Create a new Authentication tree: mfaSAML 
+5. Add required nodes in this tree, include "MFA SAML Selector Choice" node
+6. Add required choices for this node like available SP entity IDs. 
+6. Add required outcomes for "MFA SAML Selector Choice" node like HOTP SMS, HOTP Email etc and link appropriate authentication nodes for these outcomes.  
+![MFASAMLSelectionTree](./MFASAMLSelectionTree.png)
  
   
 Testing:
 ======== 
-* Authentication using otp tree
-1. Invoke URL: http://openam551.example.com:8989/openam/XUI/?realm=/employees#login&service=otp 
-![OTP Selector](./OTPSelector.png)
+* IdP initiated SAML flow Authentication, invoke URLs such as: 
+1. http://openam551.example.com:8989/openam/idpssoinit?metaAlias=/employees/idp&spEntityID=http://openam551.sp.com:8585/openam&binding=HTTP-POST&RelayState=http%3A%2F%2Fforgerock.com
+2. http://openam551.example.com:8989/openam/idpssoinit?metaAlias=/employees/idp&spEntityID=http://sp.spring.com:9494/spring-security-saml2-sample/saml/metadata&binding=HTTP-POST&RelayState=http%3A%2F%2Fforgerock.com
 
+* SP initiated SAML flow Authentication, invoke URLs such as:
+1. Invoke URL: http://openam551.sp.com:8585/openam/spssoinit?metaAlias=/sp&idpEntityID=http://openam551.example.com:8989/openam&binding=HTTP-POST&RelayState=http%3A%2F%2Fforgerock.com
 
 * * *
 
